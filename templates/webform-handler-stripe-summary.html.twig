@@ -17,4 +17,5 @@
  */
 #}
 {% if settings.debug %}<strong class="color-error">{{ 'Debugging is enabled'|t }}</strong><br />{% endif %}
-<b>Message:</b> {{ settings.message }}
+<b>Stripe Element:</b> {{ settings.stripe_element }}<br />
+<b>Amount:</b> {{ settings.amount }}<br />
