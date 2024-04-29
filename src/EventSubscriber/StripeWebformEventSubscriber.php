@@ -85,7 +85,7 @@ class StripeWebformEventSubscriber implements EventSubscriberInterface {
       if ($webform_submission) {
         $webhook_event = new StripeWebformWebhookEvent($stripe_event['type'], $webform_submission, $stripe_event);
         $this->event_dispatcher
-          ->dispatch(StripeWebformWebhookEvent::EVENT_NAME, $webhook_event);
+          ->dispatch($webhook_event, StripeWebformWebhookEvent::EVENT_NAME);
       }
     }
 

@@ -3,7 +3,7 @@
 namespace Drupal\stripe_webform\Event;
 
 use Drupal\webform\WebformSubmissionInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Drupal\Component\EventDispatcher\Event;
 
 /**
  * Event that is fired when a webhook related to a webform submission is received

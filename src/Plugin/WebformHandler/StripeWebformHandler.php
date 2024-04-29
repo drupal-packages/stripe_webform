@@ -2,6 +2,11 @@
 
 namespace Drupal\stripe_webform\Plugin\WebformHandler;
 
+use Stripe\Stripe;
+use Stripe\Customer;
+use Stripe\Charge;
+use Stripe\Subscription;
+use Stripe\Error\Base;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -32,14 +37,14 @@ class StripeWebformHandler extends WebformHandlerBase {
     /**
    * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The token manager.
    *
-   * @var \Drupal\webform\WebformTokenManagerInterface
+   * @var WebformTokenManagerInterface
    */
   protected $tokenManager;
 
@@ -233,7 +238,7 @@ class StripeWebformHandler extends WebformHandlerBase {
     $data = $this->tokenManager->replace($this->configuration, $webform_submission);
 
     try {
-      \Stripe\Stripe::setApiKey($config->get('apikey.' . $config->get('environment') . '.secret'));
+      Stripe::setApiKey($config->get('apikey.' . $config->get('environment') . '.secret'));
 
       $metadata = [
         'uuid' => $uuid,
@@ -256,7 +261,7 @@ class StripeWebformHandler extends WebformHandlerBase {
       if (!empty($data['stripe_customer_create'])) {
         $stripe_customer_create += Yaml::decode($data['stripe_customer_create']);
       }
-      $customer = \Stripe\Customer::create($stripe_customer_create);
+      $customer = Customer::create($stripe_customer_create);
 
       if (empty($data['plan_id'])) {
         // Charge the Customer instead of the card:
@@ -270,7 +275,7 @@ class StripeWebformHandler extends WebformHandlerBase {
           $stripe_charge_create += Yaml::decode($data['stripe_charge_create']);
         }
 
-        $charge = \Stripe\Charge::create($stripe_charge_create);
+        $charge = Charge::create($stripe_charge_create);
       }
       else {
         $stripe_subscription_create = [
@@ -282,11 +287,11 @@ class StripeWebformHandler extends WebformHandlerBase {
         if (!empty($data['stripe_subscription_create'])) {
           $stripe_subscription_create += Yaml::decode($data['stripe_subscription_create']);
         }
-        \Stripe\Subscription::create($stripe_subscription_create);
+        Subscription::create($stripe_subscription_create);
       }
     }
-    catch (\Stripe\Error\Base $e) {
-      drupal_set_message($this->t('Stripe error: %error', ['%error' => $e->getMessage()]), 'error');
+    catch (Base $e) {
+      $this->messenger()->addError($this->t('Stripe error: %error', ['%error' => $e->getMessage()]));
     }
  }
 
